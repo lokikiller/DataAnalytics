@@ -99,6 +99,15 @@ RUN echo '# MAHOUT and MAVEN' >> /etc/profile \
   && echo "export MAVEN_HOME=$MAVEN_HOME" >> /etc/profile \
   && echo 'export PATH=$PATH:$MAHOUT_HOME/bin:$MAVEN_HOME/bin' >> /etc/profile
 
+#install mahout
 RUN cd $MAHOUT_HOME && mvn install -DskipTests
+
+#prepare mahout enviorenment 
 RUN cd $MAHOUT_HOME/examples && mkdir temp
+ADD categories.txt  $MAHOUT_HOME/examples/temp/categories.txt
+RUN cd $MAHOUT_HOME/examples/temp \
+    && wget http://parsa.epfl.ch/cloudsuite/software/enwiki-20100904-pages-articles1.xml.bz2 \
+    && bzip2 -d enwiki-20100904-pages-articles1.xml.bz2 \
+    && wget http://download.wikimedia.org/enwiki/latest/enwiki-latest-pages-articles.xml.bz2 \
+    && bzip2 -d enwiki-latest-pages-articles.xml.bz2
 
