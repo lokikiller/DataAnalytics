@@ -2,53 +2,39 @@
 
 The data analytics benchmark relies on using the Hadoop MapReduce framework to perform machine learning analysis on large-scale datasets. Apache provides an machine learning library, Mahout, that is designed to run with Hadoop and perform large-scale data analytics.
 
-##Pull the image from Docker Repository
-```
-docker pull cloudsuite/dataanalytics
-```
 ## Building the image
+If you'd like to try directly from the Dockerfile you can build the image as:
 ```
-docker build --rm -t cloudsuite/dataanalytics .
+docker build -t CloudSuite-EPFL/DataAnalytics .
 ```
+
+##Pull the image from Docker Repository
+The image is also released as an official Docker image from Docker's automated build repository - you can always pull or refer the image when launching containers.
+```
+docker pull CloudSuite-EPFL/DataAnalytics
+```
+
+## Datasets
+This benchmark uses a Wikipedia dataset of ~30GB. We prepared a dataset container, to download this dataset once, and use it to run the benchmark. You can pull this image from Docker's automated build repository.
+```
+docker pull CloudSuite-EPFL/DataAnalytics/dataset
+```
+You can also build the image directly from the Dockerfile.
+```
+docker build -t CloudSuite-EPFL/DataAnalytics/dataset .
+```
+
 
 ## Running the image
+First you need to create the data container.
 ```
-docker run -d --name="dataanalytics" -h "dataanalytics" -p 8042:8042 -p 8088:8088 -p 50070:50070 -p 50075:50075 -p 50090:50090 cloudsuite/dataanalytics
+DATA=$(docker run -d dataset)
 ```
-
-## SSH login
-
-root password : hadoop
+Then, you are able to run the benchmark.
 
 ```
-ssh `docker inspect -f root@'{{ .NetworkSettings.IPAddress }}' dataanalytics`
+docker run -it -volumes-from $DATA CloudSuite-EPFL/DataAnalytics /etc/bootstrap.sh -bash
 ```
 
-## Hadoop run
-```
-start-all.sh
-```
-
-To check that hadoop is running run the following command:
-```
-jps
-```
-You should see that NodeManager, DataNode, NameNode, ResourceManager, and SecondaryNameNode are running:
-```
-624 NodeManager
-209 DataNode
-659 Jps
-132 NameNode
-540 ResourceManager
-334 SecondaryNameNode
-```
 ## Running the benchmark
-Run the following command in the docker container, after bringing up the hadoop.
-```
-./run.sh
-```
-
-
-
-
-
+Running the image automatically runs the benchmark as well. After completion, the model will be available in HDFS, under the wikipediamodel folder.
